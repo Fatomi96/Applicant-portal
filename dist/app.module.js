@@ -15,8 +15,8 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
-const applicant_module_1 = require("./applicant/applicant.module");
-const applicant_entity_1 = require("./applicant/applicant.entity");
+const applicant_module_1 = require("./modules/applicant/applicant.module");
+const applicant_entity_1 = require("./modules/applicant/applicant.entity");
 const typeorm_2 = require("typeorm");
 let AppModule = class AppModule {
     constructor(dataSource) {
