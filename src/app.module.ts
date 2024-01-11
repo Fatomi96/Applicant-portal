@@ -4,7 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApplicantModule } from './applicant/applicant.module';
-
+import { Applicant } from './applicant/applicant.entity';
+import { DataSource } from 'typeorm';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,10 +16,14 @@ import { ApplicantModule } from './applicant/applicant.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         return {
-          type: 'sqlite',
+          type: 'mysql',
+          host: config.get<string>('DB_HOST'),
+          port: config.get<number>('DB_PORT'),
+          username: config.get<string>('DB_USERNAME'),
+          password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
           synchronize: true,
-          entities: [],
+          entities: [Applicant],
         };
       },
     }),
@@ -27,4 +32,6 @@ import { ApplicantModule } from './applicant/applicant.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
