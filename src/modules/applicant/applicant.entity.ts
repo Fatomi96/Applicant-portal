@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuidV4 } from 'uuid';
-import { BaseEntity } from 'src/base.entity';
+import { BaseEntity } from '../../base.entity';
 
 @Entity()
 export class Applicant extends BaseEntity {

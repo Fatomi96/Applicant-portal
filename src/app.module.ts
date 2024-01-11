@@ -1,38 +1,50 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApplicantModule } from './modules/applicant/applicant.module';
-import { Applicant } from './modules/applicant/applicant.entity';
-import { DataSource } from 'typeorm';
+import { ILocalProcessEnv } from './interfaces/global';
+import { ScheduleModule } from '@nestjs/schedule';
+import { config } from 'dotenv';
+
+config();
+
+const {
+  DB_PORT: port,
+  DB_USERNAME: username,
+  DB_PASSWORD: password,
+  DB_HOST: host,
+  DB_NAME: database,
+} = process.env as typeof process.env & ILocalProcessEnv;
+
+const dbConfig: TypeOrmModuleOptions = {
+  host,
+  port,
+  username,
+  password,
+  database,
+  type: 'mysql',
+  entities: [],
+  extra: { insecureAuth: true },
+  synchronize: true,
+} as TypeOrmModuleOptions;
+
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forRoot(dbConfig),
+    TypeOrmModule.forFeature([]),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          limit: 40,
+          ttl: 60,
+        },
+      ],
     }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        return {
-          type: 'mysql',
-          host: config.get<string>('DB_HOST'),
-          port: config.get<number>('DB_PORT'),
-          username: config.get<string>('DB_USERNAME'),
-          password: config.get<string>('DB_PASSWORD'),
-          database: config.get<string>('DB_NAME'),
-          synchronize: true,
-          entities: [Applicant],
-        };
-      },
-    }),
-    ApplicantModule,
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [AppService],
 })
-
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export class AppModule {}
