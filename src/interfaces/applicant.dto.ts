@@ -30,10 +30,6 @@ export class createApplicantDto {
   })
   password: string;
 
-  @IsString()
-  @IsNotEmpty()
-  confirmPassword: string;
-
   @IsNotEmpty()
   @IsString()
   phoneNumber: string;

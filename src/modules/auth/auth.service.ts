@@ -18,14 +18,7 @@ export class AuthService {
 
   async signup(data: createApplicantDto) {
     try {
-      const {
-        firstName,
-        lastName,
-        emailAddress,
-        password,
-        confirmPassword,
-        phoneNumber,
-      } = data;
+      const { firstName, lastName, emailAddress, password, phoneNumber } = data;
 
       const checkApplicant = await this.applicantRepo.findOneBy({
         emailAddress,
@@ -36,9 +29,6 @@ export class AuthService {
           'Warning====> this applicant exists already',
         );
       }
-      if (password !== confirmPassword) {
-        throw new ConflictException('Password does not match');
-      }
 
       const salt = await bcrypt.genSalt(10);
       const passwordHash = await bcrypt.hash(password, salt);
@@ -48,7 +38,6 @@ export class AuthService {
         lastName,
         emailAddress,
         password: passwordHash,
-        confirmPassword,
         phoneNumber,
       });
 

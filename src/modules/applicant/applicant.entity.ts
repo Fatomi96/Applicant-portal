@@ -19,8 +19,6 @@ export class Applicant extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  confirmPassword: string;
-
   @Column({ type: 'varchar', nullable: false })
   phoneNumber: string;
 
