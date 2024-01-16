@@ -8,10 +8,10 @@ import {
 
 @Entity()
 export abstract class BaseEntity {
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
