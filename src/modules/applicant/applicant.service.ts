@@ -15,8 +15,8 @@ export class ApplicantService {
     return this.applicantRepo.save(newApplicant);
   }
 
-  async findOne(emailAddress: string): Promise<Applicant | null> {
-    const applicant = await this.applicantRepo.findOneBy({ emailAddress });
+  async findOne(email: string): Promise<Applicant | null> {
+    const applicant = await this.applicantRepo.findOneBy({ email });
     return applicant;
   }
 

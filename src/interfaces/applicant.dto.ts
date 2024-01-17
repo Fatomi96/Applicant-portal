@@ -19,7 +19,7 @@ export class createApplicantDto {
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  emailAddress: string;
+  email: string;
 
   @IsNotEmpty()
   @IsString()
@@ -33,4 +33,14 @@ export class createApplicantDto {
   @IsNotEmpty()
   @IsString()
   phoneNumber: string;
+}
+
+export class signinApplicantDto {
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 }
