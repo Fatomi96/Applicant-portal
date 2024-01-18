@@ -85,7 +85,7 @@ export class AuthService {
       if (!userPassword) {
         throw new UnauthorizedException('Invalid Credentials');
       }
-      const payload = { sub: user.id };
+      const payload = { sub: user.id, email: user.email };
 
       return {
         message: 'Success',
