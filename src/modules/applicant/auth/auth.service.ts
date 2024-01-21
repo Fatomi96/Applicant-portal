@@ -1,10 +1,18 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { ApplicantService } from '../applicant/applicant.service';
-import { createApplicantDto } from '../../interfaces/applicant.dto';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { ApplicantService } from '../applicant.service';
+import {
+  createApplicantDto,
+  signinApplicantDto,
+} from '../../../interfaces/applicant.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Applicant } from '../applicant/applicant.entity';
+import { Applicant } from '../applicant.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -13,15 +21,16 @@ export class AuthService {
     @InjectRepository(Applicant)
     private applicantRepo: Repository<Applicant>,
     private applicantService: ApplicantService,
+    private jwtService: JwtService,
     //private mailerService: MailerService,
   ) {}
 
   async signup(data: createApplicantDto) {
     try {
-      const { firstName, lastName, emailAddress, password, phoneNumber } = data;
+      const { firstName, lastName, email, password, phoneNumber } = data;
 
       const checkApplicant = await this.applicantRepo.findOneBy({
-        emailAddress,
+        email,
       });
 
       if (checkApplicant) {
@@ -36,7 +45,7 @@ export class AuthService {
       const newApplicant = await this.applicantService.create({
         firstName,
         lastName,
-        emailAddress,
+        email,
         password: passwordHash,
         phoneNumber,
       });
@@ -57,7 +66,33 @@ export class AuthService {
         data: newApplicant,
       };
     } catch (err) {
-      console.log(err);
+      throw new ConflictException('Warning====> this applicant exists already');
+    }
+  }
+
+  async signin(data: signinApplicantDto) {
+    try {
+      const { email, password } = data;
+
+      const user = await this.applicantRepo.findOneBy({ email });
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid Credentials');
+      }
+      const userPassword = await bcrypt.compare(password, user.password);
+
+      if (!userPassword) {
+        throw new UnauthorizedException('Invalid Credentials');
+      }
+      const payload = { sub: user.id, email: user.email };
+
+      return {
+        message: 'Success',
+        statusCode: 200,
+        data: { ...user, token: await this.jwtService.signAsync(payload) },
+      };
+    } catch (err) {
+      throw new UnauthorizedException('Invalid Credentials');
     }
   }
 }

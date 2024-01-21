@@ -14,7 +14,7 @@ export class Applicant extends BaseEntity {
   lastName: string;
 
   @Column({ type: 'varchar', nullable: false })
-  emailAddress: string;
+  email: string;
 
   @Column({ type: 'varchar', nullable: false })
   password: string;
