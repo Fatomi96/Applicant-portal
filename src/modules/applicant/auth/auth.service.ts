@@ -66,7 +66,6 @@ export class AuthService {
         data: newApplicant,
       };
     } catch (err) {
-      console.log(err);
       throw new ConflictException('Warning====> this applicant exists already');
     }
   }
@@ -93,7 +92,7 @@ export class AuthService {
         data: { ...user, token: await this.jwtService.signAsync(payload) },
       };
     } catch (err) {
-      console.log(err);
+      throw new UnauthorizedException('Invalid Credentials');
     }
   }
 }
