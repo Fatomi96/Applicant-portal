@@ -59,7 +59,6 @@ export class AdminService {
         data: { ...admin, token: await this.jwtService.signAsync(payload) },
       };
     } catch (err) {
-      console.log(err);
       throw new UnauthorizedException('Invalid Credentials');
     }
   }
