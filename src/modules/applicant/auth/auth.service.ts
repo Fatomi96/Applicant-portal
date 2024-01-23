@@ -7,7 +7,7 @@ import { ApplicantService } from '../applicant.service';
 import {
   createApplicantDto,
   signinApplicantDto,
-} from '../../../interfaces/applicant.dto';
+} from '../../../DTOs/applicants-DTO/applicant.dto';
 import { MailerService } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -84,7 +84,7 @@ export class AuthService {
       if (!userPassword) {
         throw new UnauthorizedException('Invalid Credentials');
       }
-      const payload = { sub: user.id };
+      const payload = { sub: user.id, email: user.email };
 
       return {
         message: 'Success',

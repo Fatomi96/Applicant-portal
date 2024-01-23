@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 import { config } from 'dotenv';
 import { GlobalExceptionFilter } from './decorators/GlobalExceptionHandler';
 import cookieParser from 'cookie-parser';
+import { AdminService } from './modules/admin/admin.service';
 
 config();
 
@@ -21,6 +22,9 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   (global as typeof global & { app: any }).app = app;
+  //inject the service
+  const adminService = app.get(AdminService);
+  await adminService.seedAdmin();
 
   await app.listen(process.env.PORT || 4000);
 }
