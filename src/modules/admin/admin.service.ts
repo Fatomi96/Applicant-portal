@@ -1,39 +1,72 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { Admin } from './admin.entity';
 import { adminSigninDto } from '../../DTOs/admin-DTO/admin.dto';
-import * as bcrypt from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
+import { EncryptionService } from '../../helpers/encryption/encryption.service';
+
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
     private jwtService: JwtService,
+    private encryptionService: EncryptionService,
   ) {}
 
   async seedAdmin() {
     try {
+      const {
+        ADMIN_EMAIL,
+        ADMIN_PASSWORD,
+        ADMIN_FIRSTNAME,
+        ADMIN_LASTNAME,
+        ADMIN_MOBILE,
+      } = process.env;
+      if (
+        !ADMIN_EMAIL ||
+        !ADMIN_PASSWORD ||
+        !ADMIN_FIRSTNAME ||
+        !ADMIN_LASTNAME ||
+        !ADMIN_MOBILE
+      ) {
+        throw new NotFoundException('Missing environmental variables');
+      }
       const adminExists = await this.adminRepo.findOneBy({
-        email: process.env.ADMIN_EMAIL,
+        email: ADMIN_EMAIL,
       });
 
       if (adminExists) {
-        console.log('This admin is registered');
+        return;
       }
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, salt);
+      const passwordHash = await this.encryptionService.encrypt(ADMIN_PASSWORD);
 
       const admin = await this.adminRepo.create({
-        firstName: process.env.ADMIN_FIRSTNAME,
-        lastName: process.env.ADMIN_LASTNAME,
-        email: process.env.ADMIN_EMAIL,
+        firstName: ADMIN_FIRSTNAME,
+        lastName: ADMIN_LASTNAME,
+        email: ADMIN_EMAIL,
         password: passwordHash,
-        phoneNumber: process.env.ADMIN_MOBILE,
+        phoneNumber: ADMIN_MOBILE,
       });
       await this.adminRepo.save(admin);
+
+      return {
+        message: 'Success',
+        statusCode: 201,
+        data: null,
+      };
     } catch (err) {
-      console.log(err);
+      if (err instanceof NotFoundException) {
+        return {
+          message: err.message,
+          statusCode: 404,
+          data: null,
+        };
+      }
     }
   }
 
@@ -46,9 +79,9 @@ export class AdminService {
       if (!admin) {
         throw new UnauthorizedException('Invalid Credentials');
       }
-      const userPassword = await bcrypt.compare(password, admin.password);
+      const userPassword = await this.encryptionService.decrypt(admin.password);
 
-      if (!userPassword) {
+      if (userPassword !== password) {
         throw new UnauthorizedException('Invalid Credentials');
       }
       const payload = { sub: admin.id, email: admin.email };
@@ -59,7 +92,13 @@ export class AdminService {
         data: { ...admin, token: await this.jwtService.signAsync(payload) },
       };
     } catch (err) {
-      throw new UnauthorizedException('Invalid Credentials');
+      if (err instanceof UnauthorizedException) {
+        return {
+          message: err.message,
+          statusCode: 401,
+          data: null,
+        };
+      }
     }
   }
 }

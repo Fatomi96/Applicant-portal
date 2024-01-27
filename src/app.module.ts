@@ -16,6 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AdminController } from './modules/admin/admin.controller';
 import { AdminModule } from './modules/admin/admin.module';
 import { Admin } from './modules/admin/admin.entity';
+import { EncryptionModule } from './helpers/encryption/encryption.module';
 config();
 
 // const mailerOptions = {
@@ -70,6 +71,7 @@ const jwtOptions = {
 @Module({
   imports: [
     //MailerModule.forRoot(mailerOptions),
+    EncryptionModule,
     JwtModule.register(jwtOptions),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(dbConfig),

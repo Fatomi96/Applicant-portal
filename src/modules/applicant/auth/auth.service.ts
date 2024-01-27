@@ -3,17 +3,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
+import { JwtService } from '@nestjs/jwt';
+import { Repository } from 'typeorm';
 import { ApplicantService } from '../applicant.service';
 import {
   createApplicantDto,
   signinApplicantDto,
 } from '../../../DTOs/applicants-DTO/applicant.dto';
-import { MailerService } from '@nestjs-modules/mailer';
-import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Applicant } from '../applicant.entity';
-import { Repository } from 'typeorm';
+import { EncryptionService } from '../../../helpers/encryption/encryption.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
     private applicantRepo: Repository<Applicant>,
     private applicantService: ApplicantService,
     private jwtService: JwtService,
+    private encryptionservice: EncryptionService,
     //private mailerService: MailerService,
   ) {}
 
@@ -39,8 +41,10 @@ export class AuthService {
         );
       }
 
-      const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(password, salt);
+      //const salt = await bcrypt.genSalt(10);
+      //const passwordHash = await bcrypt.hash(password, salt);
+
+      const passwordHash = await this.encryptionservice.encrypt(password);
 
       const newApplicant = await this.applicantService.create({
         firstName,
@@ -49,7 +53,6 @@ export class AuthService {
         password: passwordHash,
         phoneNumber,
       });
-
       // const result = await this.mailerService.sendMail({
       //   to: emailAddress,
       //   subject: 'Welcome',
@@ -66,7 +69,13 @@ export class AuthService {
         data: newApplicant,
       };
     } catch (err) {
-      throw new ConflictException('Warning====> this applicant exists already');
+      if (err instanceof ConflictException) {
+        return {
+          message: 'Warning====> this applicant exists already',
+          statusCode: 409,
+          data: null,
+        };
+      }
     }
   }
 
@@ -79,9 +88,11 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('Invalid Credentials');
       }
-      const userPassword = await bcrypt.compare(password, user.password);
+      //const userPassword = await bcrypt.compare(password, user.password);
 
-      if (!userPassword) {
+      const userPassword = await this.encryptionservice.decrypt(user.password);
+
+      if (userPassword !== password) {
         throw new UnauthorizedException('Invalid Credentials');
       }
       const payload = { sub: user.id, email: user.email };
@@ -92,7 +103,13 @@ export class AuthService {
         data: { ...user, token: await this.jwtService.signAsync(payload) },
       };
     } catch (err) {
-      throw new UnauthorizedException('Invalid Credentials');
+      if (err instanceof UnauthorizedException) {
+        return {
+          message: 'Invalid Credentials',
+          statusCode: 401,
+          data: null,
+        };
+      }
     }
   }
 }

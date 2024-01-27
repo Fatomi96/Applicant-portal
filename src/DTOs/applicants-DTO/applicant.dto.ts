@@ -9,20 +9,16 @@ import {
 
 export class createApplicantDto {
   @IsNotEmpty()
-  @IsString()
   firstName: string;
 
   @IsNotEmpty()
-  @IsString()
   lastName: string;
 
   @IsNotEmpty()
-  @IsString()
   @IsEmail()
   email: string;
 
   @IsNotEmpty()
-  @IsString()
   @MinLength(8)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
     message:
@@ -31,7 +27,6 @@ export class createApplicantDto {
   password: string;
 
   @IsNotEmpty()
-  @IsString()
   phoneNumber: string;
 }
 
