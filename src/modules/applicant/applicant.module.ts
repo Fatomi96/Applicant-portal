@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Applicant } from './applicant.entity';
 import { EncryptionModule } from '../../helpers/encryption/encryption.module';
 import { EncryptionService } from '../../helpers/encryption/encryption.service';
+
 @Module({
   imports: [EncryptionModule, TypeOrmModule.forFeature([Applicant])],
   controllers: [ApplicantController],
