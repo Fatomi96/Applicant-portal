@@ -12,7 +12,7 @@ import { ApplicantService } from '../applicant.service';
 import {
   createApplicantDto,
   signinApplicantDto,
-} from '../../../interfaces/applicant.dto';
+} from '../../../DTOs/applicants-DTO/applicant.dto';
 import { AuthGuard } from '../../../decorators/auth-guard';
 
 @Controller('auth')

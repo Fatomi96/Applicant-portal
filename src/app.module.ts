@@ -13,6 +13,10 @@ import { AuthController } from './modules/applicant/auth/auth.controller';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { Applicant } from './modules/applicant/applicant.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { AdminController } from './modules/admin/admin.controller';
+import { AdminModule } from './modules/admin/admin.module';
+import { Admin } from './modules/admin/admin.entity';
+import { EncryptionModule } from './helpers/encryption/encryption.module';
 config();
 
 // const mailerOptions = {
@@ -53,7 +57,7 @@ const dbConfig: TypeOrmModuleOptions = {
   password,
   database,
   type: 'mysql',
-  entities: [Applicant],
+  entities: [Applicant, Admin],
   extra: { insecureAuth: true },
   synchronize: true,
 } as TypeOrmModuleOptions;
@@ -67,11 +71,12 @@ const jwtOptions = {
 @Module({
   imports: [
     //MailerModule.forRoot(mailerOptions),
+    EncryptionModule,
     JwtModule.register(jwtOptions),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(dbConfig),
 
-    TypeOrmModule.forFeature([Applicant]),
+    TypeOrmModule.forFeature([Applicant, Admin]),
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -81,8 +86,9 @@ const jwtOptions = {
       ],
     }),
     ApplicantModule,
+    AdminModule,
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, AdminController],
   providers: [AppService, AuthService],
   exports: [AppService],
 })

@@ -3,7 +3,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { BaseEntity } from '../../base.entity';
 
 @Entity()
-export class Applicant extends BaseEntity {
+export class Admin extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidV4();
 
@@ -29,16 +29,7 @@ export class Applicant extends BaseEntity {
   address: string;
 
   @Column({ type: 'varchar', nullable: true })
-  university: string;
-
-  @Column({ type: 'varchar', nullable: true })
-  courseOfStudy: string;
-
-  @Column({ type: 'float', nullable: true })
-  cgpa: number;
-
-  @Column({ type: 'varchar', nullable: true })
-  cv: string;
+  country: string;
 
   @Column({ type: 'varchar', nullable: true })
   image: string;
