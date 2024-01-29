@@ -89,6 +89,7 @@ export class AuthService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
+      throw new ConflictException('Warning====> this applicant exists already');
     }
   }
 
@@ -133,6 +134,7 @@ export class AuthService {
           );
         }
       }
+      throw new UnauthorizedException('Invalid Credentials');
     }
   }
 }
