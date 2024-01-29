@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -70,11 +72,22 @@ export class AuthService {
       };
     } catch (err) {
       if (err instanceof ConflictException) {
-        return {
-          message: 'Warning====> this applicant exists already',
-          statusCode: 409,
-          data: null,
-        };
+        throw new HttpException(
+          {
+            status: HttpStatus.CONFLICT,
+            message: err.message,
+            error: 'CONFLICT',
+          },
+          HttpStatus.CONFLICT,
+        );
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Internal server error',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }
@@ -82,14 +95,11 @@ export class AuthService {
   async signin(data: signinApplicantDto) {
     try {
       const { email, password } = data;
-
       const user = await this.applicantRepo.findOneBy({ email });
 
       if (!user) {
         throw new UnauthorizedException('Invalid Credentials');
       }
-      //const userPassword = await bcrypt.compare(password, user.password);
-
       const userPassword = await this.encryptionservice.decrypt(user.password);
 
       if (userPassword !== password) {
@@ -104,11 +114,24 @@ export class AuthService {
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) {
-        return {
-          message: 'Invalid Credentials',
-          statusCode: 401,
-          data: null,
-        };
+        if (err instanceof UnauthorizedException) {
+          throw new HttpException(
+            {
+              status: HttpStatus.UNAUTHORIZED,
+              message: err.message,
+              error: 'UNAUTHORIZED',
+            },
+            HttpStatus.UNAUTHORIZED,
+          );
+        } else {
+          throw new HttpException(
+            {
+              status: HttpStatus.INTERNAL_SERVER_ERROR,
+              message: 'Internal server error',
+            },
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
       }
     }
   }

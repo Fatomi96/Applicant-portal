@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -34,7 +36,9 @@ export class AdminService {
         !ADMIN_LASTNAME ||
         !ADMIN_MOBILE
       ) {
-        throw new NotFoundException('Missing environmental variables');
+        throw new NotFoundException(
+          'Missing seed admin environment credentials',
+        );
       }
       const adminExists = await this.adminRepo.findOneBy({
         email: ADMIN_EMAIL,
@@ -61,11 +65,22 @@ export class AdminService {
       };
     } catch (err) {
       if (err instanceof NotFoundException) {
-        return {
-          message: err.message,
-          statusCode: 404,
-          data: null,
-        };
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            message: err.message,
+            error: 'Not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Internal server error',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }
@@ -73,7 +88,6 @@ export class AdminService {
   async adminSignin(data: adminSigninDto) {
     try {
       const { email, password } = data;
-
       const admin = await this.adminRepo.findOneBy({ email });
 
       if (!admin) {
@@ -93,11 +107,22 @@ export class AdminService {
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) {
-        return {
-          message: err.message,
-          statusCode: 401,
-          data: null,
-        };
+        throw new HttpException(
+          {
+            status: HttpStatus.UNAUTHORIZED,
+            message: err.message,
+            error: 'UNAUTHORIZED',
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Internal server error',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }

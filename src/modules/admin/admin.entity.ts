@@ -13,7 +13,7 @@ export class Admin extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   lastName: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   email: string;
 
   @Column({ type: 'varchar', nullable: false })
