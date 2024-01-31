@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { ApplicantService } from '../applicant/applicant.service';
 import {
@@ -22,9 +21,7 @@ export class AuthService {
     @InjectRepository(Applicant)
     private applicantRepo: Repository<Applicant>,
     private applicantService: ApplicantService,
-    private jwtService: JwtService,
     private encryptionservice: EncryptionService,
-    //private mailerService: MailerService,
   ) { }
 
   async signup(data: createApplicantDto) {
@@ -96,7 +93,6 @@ export class AuthService {
       return {
         message: 'Success',
         statusCode: 200,
-        data: { ...user, token: await this.jwtService.signAsync(payload) },
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) {
