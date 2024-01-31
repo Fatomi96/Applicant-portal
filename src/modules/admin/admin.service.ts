@@ -7,16 +7,14 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtService } from '@nestjs/jwt';
 import { Admin } from './admin.entity';
 import { adminSigninDto } from './admin.dto';
-import { EncryptionService } from '../../utils/helpers/encryption.service';
+import { EncryptionService } from '../../utils/helpers/encryptionService';
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
-    private jwtService: JwtService,
     private encryptionService: EncryptionService,
   ) { }
 
@@ -103,7 +101,6 @@ export class AdminService {
       return {
         message: 'Success',
         statusCode: 200,
-        data: { ...admin, token: await this.jwtService.signAsync(payload) },
       };
     } catch (err) {
       if (err instanceof UnauthorizedException) {

@@ -7,7 +7,8 @@ import { createApplicantDto } from './applicant.dto';
 @Injectable()
 export class ApplicantService {
   constructor(
-    @InjectRepository(Applicant) private applicantRepo: Repository<Applicant>,
+    @InjectRepository(Applicant)
+    private applicantRepo: Repository<Applicant>,
   ) { }
 
   async create(data: createApplicantDto): Promise<Applicant> {

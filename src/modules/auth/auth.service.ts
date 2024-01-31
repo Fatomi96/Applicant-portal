@@ -14,7 +14,7 @@ import {
   signinApplicantDto,
 } from '../applicant/applicant.dto';
 import { Applicant } from '../applicant/applicant.entity';
-import { EncryptionService } from '../../utils/helpers/encryption.service';
+import { EncryptionService } from '../../utils/helpers/encryptionService';
 
 @Injectable()
 export class AuthService {

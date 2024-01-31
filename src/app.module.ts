@@ -10,11 +10,9 @@ import { config } from 'dotenv';
 import { AuthService } from './modules/auth/auth.service';
 import { AuthController } from './modules/auth/auth.controller';
 import { Applicant } from './modules/applicant/applicant.entity';
-import { JwtModule } from '@nestjs/jwt';
 import { AdminController } from './modules/admin/admin.controller';
 import { AdminModule } from './modules/admin/admin.module';
 import { Admin } from './modules/admin/admin.entity';
-import { EncryptionModule } from './utils/helpers/encryption.module';
 
 config();
 
@@ -38,19 +36,10 @@ const dbConfig: TypeOrmModuleOptions = {
   synchronize: true,
 } as TypeOrmModuleOptions;
 
-const jwtOptions = {
-  global: true,
-  secret: process.env.Jwt_Secret_Key,
-  signOptions: { expiresIn: '3d' },
-};
-
 @Module({
   imports: [
-    EncryptionModule,
-    JwtModule.register(jwtOptions),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(dbConfig),
-
     TypeOrmModule.forFeature([Applicant, Admin]),
     ThrottlerModule.forRoot({
       throttlers: [

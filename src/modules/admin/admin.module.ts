@@ -2,11 +2,10 @@ import { Module } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Admin } from './admin.entity';
-import { EncryptionModule } from '../../utils/helpers/encryption.module';
-import { EncryptionService } from '../../utils/helpers/encryption.service';
+import { EncryptionService } from '../../utils/helpers/encryptionService';
 
 @Module({
-  imports: [EncryptionModule, TypeOrmModule.forFeature([Admin])],
+  imports: [TypeOrmModule.forFeature([Admin])],
   providers: [AdminService, EncryptionService],
   controllers: [],
   exports: [AdminService],

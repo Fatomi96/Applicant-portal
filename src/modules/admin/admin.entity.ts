@@ -1,11 +1,10 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { v4 as uuidV4 } from 'uuid';
 import { BaseEntity } from '../../base.entity';
 
 @Entity()
 export class Admin extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidV4();
+  id: string;
 
   @Column({ type: 'varchar', nullable: false })
   firstName: string;
