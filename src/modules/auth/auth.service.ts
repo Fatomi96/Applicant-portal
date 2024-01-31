@@ -1,17 +1,9 @@
-import {
-  ConflictException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Logger from '../../utils/helpers/Logger';
 import { ApplicantService } from '../applicant/applicant.service';
-import {
-  createApplicantDto,
-  signinApplicantDto,
-} from '../applicant/applicant.dto';
+import { LoginDto, SignUpDto } from '../applicant/applicant.dto';
 import { Applicant } from '../applicant/applicant.entity';
 import { EncryptionService } from '../../utils/helpers/encryptionService';
 
@@ -24,44 +16,40 @@ export class AuthService {
     private encryptionservice: EncryptionService,
   ) { }
 
-  async signup(data: createApplicantDto) {
+  async createApplicant(data: SignUpDto) {
     try {
-      const { firstName, lastName, email, password, phoneNumber } = data;
-      const checkApplicant = await this.applicantRepo.findOneBy({
-        email,
-      });
+      const { firstName, lastName, email, phoneNumber } = data;
+      const isApplicant = await this.applicantRepo.findOneBy({ email });
 
-      if (checkApplicant) {
-        throw new ConflictException(
-          'Warning====> this applicant exists already',
-        );
+      if (isApplicant) {
+        Logger.warn(`Conflict: An account exist with this email: ${email}, please login...`)
+        throw new ConflictException(`Conflict: An account exist with this email: ${email}, please login...`);
       }
 
-      const passwordHash = await this.encryptionservice.encrypt(password);
+      const encryptedPassword = await this.encryptionservice.encrypt(data.password);
+      const applicant = new Applicant();
 
-      const newApplicant = await this.applicantService.create({
-        firstName,
-        lastName,
-        email,
-        password: passwordHash,
-        phoneNumber,
-      });
+      applicant.firstName = firstName;
+      applicant.lastName = lastName;
+      applicant.email = email;
+      applicant.phoneNumber = phoneNumber;
+      applicant.password = encryptedPassword;
 
-      return {
-        message: 'Congratulations, you have been registered successfully',
-        statusCode: 201,
-        data: newApplicant,
-      };
-    } catch (err) {
-      if (err instanceof ConflictException) {
+      const createdApplicant = await this.applicantRepo.save(applicant);
+      const { password, ...applicantData } = createdApplicant;
+
+      Logger.info(`Applicant with email: ${createdApplicant.email} created successfully`);
+      return { statusCode: HttpStatus.CREATED, message: `Applicant with email: ${createdApplicant.email} created successfully`, data: { ...applicantData } };
+    } catch (error) {
+      Logger.error(error.message || 'An error occurred during creation of applicant');
+      if (error instanceof ConflictException) {
         throw new HttpException(
           {
             status: HttpStatus.CONFLICT,
-            message: err.message,
+            message: error.message,
             error: 'CONFLICT',
           },
-          HttpStatus.CONFLICT,
-        );
+          HttpStatus.CONFLICT);
       } else {
         throw new HttpException(
           {
@@ -71,11 +59,10 @@ export class AuthService {
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-      throw new ConflictException('Warning====> this applicant exists already');
     }
   }
 
-  async signin(data: signinApplicantDto) {
+  async login(data: LoginDto) {
     try {
       const { email, password } = data;
       const user = await this.applicantRepo.findOneBy({ email });

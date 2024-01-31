@@ -4,9 +4,10 @@ import {
   Matches,
   IsNotEmpty,
   IsEmail,
+  Length,
 } from 'class-validator';
 
-export class createApplicantDto {
+export class SignUpDto {
   @IsString()
   @IsNotEmpty()
   firstName: string;
@@ -15,8 +16,8 @@ export class createApplicantDto {
   @IsNotEmpty()
   lastName: string;
 
-  @IsNotEmpty()
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
   @IsString()
@@ -30,15 +31,17 @@ export class createApplicantDto {
 
   @IsString()
   @IsNotEmpty()
+  @Length(11, 11, { message: 'Phone number must be an 11-digit number and must start with 0.' })
+  @Matches(/^[0]\d{10}$/, { message: 'Phone number must be an 11-digit number and must start with 0.' })
   phoneNumber: string;
 }
 
-export class signinApplicantDto {
-  @IsNotEmpty()
+export class LoginDto {
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   password: string;
 }

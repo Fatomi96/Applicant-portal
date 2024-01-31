@@ -8,37 +8,24 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApplicantService } from '../applicant/applicant.service';
-import {
-  createApplicantDto,
-  signinApplicantDto,
-} from '../applicant/applicant.dto';
+import { SignUpDto, LoginDto } from '../applicant/applicant.dto';
 import { AuthGuard } from '../../decorators/auth-guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private applicantService: ApplicantService,
-  ) { }
+  constructor(private authService: AuthService) { }
 
-  @Post('/applicant/signup')
-  async applicantSignup(
-    @Body() body: createApplicantDto,
-    @Res({ passthrough: true }) response,
-  ) {
-    const data = await this.authService.signup(body);
+  @Post('/applicant/create')
+  async createApplicant(@Body() signUpDto: SignUpDto) {
+    const data = await this.authService.createApplicant(signUpDto);
 
-    response.json(data);
+    return data;
   }
 
-  @Post('/applicant/signin')
-  async applicantSignin(
-    @Body() body: signinApplicantDto,
-    @Res({ passthrough: true }) response,
-  ) {
-    const data = await this.authService.signin(body);
-    response.json(data);
+  @Post('/login')
+  async applicantSignin(@Body() loginDto: LoginDto) {
+    const data = await this.authService.login(loginDto);
+    return data;
   }
 
   @Get('/applicant/profile')
