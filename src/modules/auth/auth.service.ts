@@ -5,18 +5,16 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MailerService } from '@nestjs-modules/mailer';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { ApplicantService } from '../applicant.service';
+import { ApplicantService } from '../applicant/applicant.service';
 import {
   createApplicantDto,
   signinApplicantDto,
-} from '../../../DTOs/applicants-DTO/applicant.dto';
-import { Applicant } from '../applicant.entity';
-import { EncryptionService } from '../../../helpers/encryption/encryption.service';
+} from '../applicant/applicant.dto';
+import { Applicant } from '../applicant/applicant.entity';
+import { EncryptionService } from '../../utils/helpers/encryption.service';
 
 @Injectable()
 export class AuthService {
@@ -27,12 +25,11 @@ export class AuthService {
     private jwtService: JwtService,
     private encryptionservice: EncryptionService,
     //private mailerService: MailerService,
-  ) {}
+  ) { }
 
   async signup(data: createApplicantDto) {
     try {
       const { firstName, lastName, email, password, phoneNumber } = data;
-
       const checkApplicant = await this.applicantRepo.findOneBy({
         email,
       });
@@ -43,9 +40,6 @@ export class AuthService {
         );
       }
 
-      //const salt = await bcrypt.genSalt(10);
-      //const passwordHash = await bcrypt.hash(password, salt);
-
       const passwordHash = await this.encryptionservice.encrypt(password);
 
       const newApplicant = await this.applicantService.create({
@@ -55,15 +49,6 @@ export class AuthService {
         password: passwordHash,
         phoneNumber,
       });
-      // const result = await this.mailerService.sendMail({
-      //   to: emailAddress,
-      //   subject: 'Welcome',
-      //   template: './../../templates/welcome.pug',
-      //   context: {
-      //     name: firstName,
-      //   },
-      // });
-      // console.log(result);
 
       return {
         message: 'Congratulations, you have been registered successfully',

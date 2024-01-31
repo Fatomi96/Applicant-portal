@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Applicant } from './applicant.entity';
-import { createApplicantDto } from '../../DTOs/applicants-DTO/applicant.dto';
+import { createApplicantDto } from './applicant.dto';
 
 @Injectable()
 export class ApplicantService {
   constructor(
     @InjectRepository(Applicant) private applicantRepo: Repository<Applicant>,
-  ) {}
+  ) { }
 
   async create(data: createApplicantDto): Promise<Applicant> {
     const newApplicant = this.applicantRepo.create(data);

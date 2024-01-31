@@ -4,13 +4,14 @@ import {
   Matches,
   IsNotEmpty,
   IsEmail,
-  IsOptional,
 } from 'class-validator';
 
 export class createApplicantDto {
+  @IsString()
   @IsNotEmpty()
   firstName: string;
 
+  @IsString()
   @IsNotEmpty()
   lastName: string;
 
@@ -18,6 +19,7 @@ export class createApplicantDto {
   @IsEmail()
   email: string;
 
+  @IsString()
   @IsNotEmpty()
   @MinLength(8)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, {
@@ -26,13 +28,14 @@ export class createApplicantDto {
   })
   password: string;
 
+  @IsString()
   @IsNotEmpty()
   phoneNumber: string;
 }
 
 export class signinApplicantDto {
   @IsNotEmpty()
-  @IsString()
+  @IsEmail()
   email: string;
 
   @IsNotEmpty()

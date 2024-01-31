@@ -9,8 +9,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Admin } from './admin.entity';
-import { adminSigninDto } from '../../DTOs/admin-DTO/admin.dto';
-import { EncryptionService } from '../../helpers/encryption/encryption.service';
+import { adminSigninDto } from './admin.dto';
+import { EncryptionService } from '../../utils/helpers/encryption.service';
 
 @Injectable()
 export class AdminService {
@@ -18,7 +18,7 @@ export class AdminService {
     @InjectRepository(Admin) private adminRepo: Repository<Admin>,
     private jwtService: JwtService,
     private encryptionService: EncryptionService,
-  ) {}
+  ) { }
 
   async seedAdmin() {
     try {

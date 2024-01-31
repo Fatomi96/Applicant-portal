@@ -5,6 +5,7 @@ export class adminSigninDto {
   @IsEmail()
   email: string;
 
+  @IsString()
   @IsNotEmpty()
   password: string;
 }

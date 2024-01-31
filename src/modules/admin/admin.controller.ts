@@ -1,11 +1,11 @@
 import { Controller, Post, Body, Res } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { adminSigninDto } from '../../DTOs/admin-DTO/admin.dto';
+import { adminSigninDto } from './admin.dto';
 import { response } from 'express';
 
 @Controller('admin')
 export class AdminController {
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService) { }
 
   @Post('/login')
   async adminLogin(

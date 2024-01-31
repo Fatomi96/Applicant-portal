@@ -8,19 +8,19 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApplicantService } from '../applicant.service';
+import { ApplicantService } from '../applicant/applicant.service';
 import {
   createApplicantDto,
   signinApplicantDto,
-} from '../../../DTOs/applicants-DTO/applicant.dto';
-import { AuthGuard } from '../../../decorators/auth-guard';
+} from '../applicant/applicant.dto';
+import { AuthGuard } from '../../decorators/auth-guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private applicantService: ApplicantService,
-  ) {}
+  ) { }
 
   @Post('/applicant/signup')
   async applicantSignup(
