@@ -18,7 +18,7 @@ export class EncryptionService {
     }
     const key = (await promisify(scrypt)(
       PASS,
-      Buffer.from('salt'),  // Change: Provide a Buffer here
+      Buffer.from('salt'),
       this.keyLength,
     )) as Buffer;
     const cipher = createCipheriv(this.algorithm, key, iv);
@@ -41,7 +41,7 @@ export class EncryptionService {
 
     const key = (await promisify(scrypt)(
       PASS,
-      Buffer.from('salt'),  // Change: Provide a Buffer here
+      Buffer.from('salt'),
       this.keyLength,
     )) as Buffer;
     const decipher = createDecipheriv(this.algorithm, key, iv);

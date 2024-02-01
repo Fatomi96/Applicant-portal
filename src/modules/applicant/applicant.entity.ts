@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '../../base.entity';
+import { RoleTypes } from '../auth/auth.interface';
 
 @Entity()
 export class Applicant extends BaseEntity {
@@ -41,4 +42,10 @@ export class Applicant extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   image: string;
+
+  @Column({ type: 'enum', enum: RoleTypes, nullable: true })
+  role: RoleTypes;
+
+  @Column({ type: 'bool', default: false })
+  hasCompletedProfile: boolean;
 }
