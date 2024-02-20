@@ -34,8 +34,8 @@ export class Applicant extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   courseOfStudy: string;
 
-  @Column({ type: 'double', nullable: true })
-  cgpa: number;
+  @Column({ type: 'varchar', nullable: true })
+  cgpa: string;
 
   @Column({ type: 'varchar', nullable: true })
   cv: string;

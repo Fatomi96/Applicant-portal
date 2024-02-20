@@ -7,13 +7,13 @@ import { UpdateApplicantDto } from './applicant.dto';
 export class ApplicantController {
   constructor(private readonly applicantService: ApplicantService) {}
 
-  @Patch('/admin/activate')
+  @Patch('/update')
   @UseGuards(AuthGuard)
-  async activateDisabledAdmin(
+  async updateApplicantProfile(
     @Request() request,
     @Body() updateApplicantDto: UpdateApplicantDto,
   ) {
-    const email = request.user;
+    const { email } = request.user;
     const data = await this.applicantService.updateApplicantProfile(
       email,
       updateApplicantDto,

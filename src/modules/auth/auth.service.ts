@@ -95,11 +95,11 @@ export class AuthService {
         throw new NotFoundException('Account with this details not found');
       }
 
-      const decryptPassword = await this.encryptionservice.decrypt(
+      const decryptedPassword = await this.encryptionservice.decrypt(
         user.password,
       );
 
-      if (decryptPassword !== data.password) {
+      if (decryptedPassword !== data.password) {
         Logger.warn('Unauthorized access - Invalid Credentials');
         throw new UnauthorizedException(
           'Unauthorized access - Invalid Credentials',

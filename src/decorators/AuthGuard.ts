@@ -8,18 +8,20 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import Logger from '../utils/helpers/Logger';
 import { EncryptionService } from '../utils/helpers/encryptionService';
 import { Admin } from '../modules/admin/admin.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AuthService } from '../modules/auth/auth.service';
+import { Applicant } from '../modules/applicant/applicant.entity';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
+    @InjectRepository(Applicant)
+    private applicantRepository: Repository<Applicant>,
     @InjectRepository(Admin)
-    private encryptionservice: EncryptionService,
-    private authService: AuthService,
+    private adminRepository: Repository<Admin>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -37,13 +39,15 @@ export class AuthGuard implements CanActivate {
       }
 
       const token = authorization.split(' ')[1];
-      const decodedToken = JSON.parse(
-        await this.encryptionservice.decrypt(token),
-      );
+      const encryptionService = new EncryptionService();
+
+      const decodedToken = JSON.parse(await encryptionService.decrypt(token));
       const currentTimestamp = Math.floor(Date.now() / 1000);
 
       if (decodedToken.exp && decodedToken.exp < currentTimestamp) {
-        Logger.warn('Athorization token has expired, kindly login to continue');
+        Logger.warn(
+          'Authorization token has expired, kindly login to continue',
+        );
         throw new UnauthorizedException(
           'Athorization token has expired, kindly login to continue',
         );
@@ -51,7 +55,14 @@ export class AuthGuard implements CanActivate {
 
       let user: any;
 
-      user = await this.authService.getUserType(decodedToken.email);
+      user = await this.applicantRepository.findOneBy({
+        email: decodedToken.email,
+      });
+
+      if (!user)
+        user = await this.adminRepository.findOneBy({
+          email: decodedToken.email,
+        });
 
       if (!user) {
         Logger.warn('Account with this details not found');
@@ -93,7 +104,7 @@ export class AuthGuard implements CanActivate {
         throw new HttpException(
           {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            message: 'Login service failed, contact support team!',
+            message: 'Authorization service failed, contact support!!!',
           },
           HttpStatus.INTERNAL_SERVER_ERROR,
         );

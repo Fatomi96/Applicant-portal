@@ -1,11 +1,10 @@
-import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-// import { AuthGuard } from '../../decorators/auth-guard';
 import { CreateApplicantDto, LoginDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
   @Post('/applicant/create')
   async createApplicant(@Body() createApplicantDto: CreateApplicantDto) {

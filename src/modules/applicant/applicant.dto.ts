@@ -1,4 +1,11 @@
-import { IsDateString, IsDecimal, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class UpdateApplicantDto {
   @IsDateString()
@@ -17,7 +24,9 @@ export class UpdateApplicantDto {
   @IsNotEmpty()
   courseOfStudy: string;
 
-  @IsDecimal()
+  @IsNumber()
   @IsNotEmpty()
+  @Min(0, { message: 'Minimum value is 0' })
+  @Max(5.0, { message: 'Maximum value is 5.0' })
   cgpa: number;
 }

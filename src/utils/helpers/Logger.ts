@@ -20,7 +20,7 @@ class Logger {
     this.logger = winston.createLogger({
       level: 'info',
       format: combine(
-        label({ label: '--> Paperless PreRegistration logs' }),
+        label({ label: '--> Applicant portal logs' }),
         timestamp(),
         logFormat,
       ),
@@ -28,39 +28,39 @@ class Logger {
         new winston.transports.Console({
           level: 'debug',
           handleExceptions: true,
-          format: winston.format.json()
+          format: winston.format.json(),
         }),
         new winston.transports.File({
           filename: this.LOG_FILE.ERROR,
           level: 'error',
           handleExceptions: true,
-          format: winston.format.json()
+          format: winston.format.json(),
         }),
         new winston.transports.File({
           filename: this.LOG_FILE.WARN,
           level: 'warn',
           handleExceptions: true,
-          format: winston.format.json()
+          format: winston.format.json(),
         }),
         new winston.transports.File({
           filename: this.LOG_FILE.ALL,
           handleExceptions: true,
-          format: winston.format.json()
+          format: winston.format.json(),
         }),
         new winston.transports.File({
           filename: this.LOG_FILE.DEBUG,
           level: 'debug',
           handleExceptions: true,
-          format: winston.format.json()
+          format: winston.format.json(),
         }),
         new winston.transports.File({
           filename: this.LOG_FILE.INFO,
           level: 'info',
           handleExceptions: true,
-          format: winston.format.json()
+          format: winston.format.json(),
         }),
       ],
-      exitOnError: false
+      exitOnError: false,
     });
   }
 
