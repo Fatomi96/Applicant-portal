@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-// import { ApplicantModule } from './modules/applicant/applicant.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { config } from 'dotenv';
+import { ApplicantModule } from './modules/applicant/applicant.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ILocalProcessEnv } from './interfaces/global';
-import { ScheduleModule } from '@nestjs/schedule';
-import { config } from 'dotenv';
 import { AuthService } from './modules/auth/auth.service';
 import { AuthController } from './modules/auth/auth.controller';
 import { Applicant } from './modules/applicant/applicant.entity';
@@ -51,7 +51,7 @@ const dbConfig: TypeOrmModuleOptions = {
         },
       ],
     }),
-    // ApplicantModule,
+    ApplicantModule,
     AdminModule,
     AuthModule,
   ],
@@ -59,5 +59,4 @@ const dbConfig: TypeOrmModuleOptions = {
   providers: [AppService, AuthService, EncryptionService],
   exports: [AppService],
 })
-
-export class AppModule { }
+export class AppModule {}

@@ -1,4 +1,11 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Logger from '../../utils/helpers/Logger';
@@ -16,7 +23,7 @@ export class AuthService {
     @InjectRepository(Admin)
     private adminRepository: Repository<Admin>,
     private encryptionservice: EncryptionService,
-  ) { }
+  ) {}
 
   async createApplicant(data: CreateApplicantDto) {
     try {
@@ -24,11 +31,17 @@ export class AuthService {
       const isApplicant = await this.applicantRepo.findOneBy({ email });
 
       if (isApplicant) {
-        Logger.warn(`Conflict: An account exist with this email: ${email}, please login...`)
-        throw new ConflictException(`Conflict: An account exist with this email: ${email}, please login...`);
+        Logger.warn(
+          `Conflict: An account exist with this email: ${email}, please login...`,
+        );
+        throw new ConflictException(
+          `Conflict: An account exist with this email: ${email}, please login...`,
+        );
       }
 
-      const encryptedPassword = await this.encryptionservice.encrypt(data.password);
+      const encryptedPassword = await this.encryptionservice.encrypt(
+        data.password,
+      );
       const applicant = new Applicant();
 
       applicant.firstName = firstName;
@@ -41,8 +54,14 @@ export class AuthService {
       const createdApplicant = await this.applicantRepo.save(applicant);
       const { password, ...applicantData } = createdApplicant;
 
-      Logger.info(`Applicant with email: ${createdApplicant.email} created successfully`);
-      return { statusCode: HttpStatus.CREATED, message: `Applicant with email: ${createdApplicant.email} created successfully`, data: { ...applicantData } };
+      Logger.info(
+        `Applicant with email: ${createdApplicant.email} created successfully`,
+      );
+      return {
+        statusCode: HttpStatus.CREATED,
+        message: `Applicant with email: ${createdApplicant.email} created successfully`,
+        data: { ...applicantData },
+      };
     } catch (error) {
       Logger.error(error || 'An error occurred during creation of applicant');
       if (error instanceof ConflictException) {
@@ -52,7 +71,8 @@ export class AuthService {
             message: error.message,
             error: 'CONFLICT',
           },
-          HttpStatus.CONFLICT);
+          HttpStatus.CONFLICT,
+        );
       } else {
         throw new HttpException(
           {
@@ -75,43 +95,63 @@ export class AuthService {
         throw new NotFoundException('Account with this details not found');
       }
 
-      const decryptPassword = await this.encryptionservice.decrypt(user.password);
+      const decryptPassword = await this.encryptionservice.decrypt(
+        user.password,
+      );
 
       if (decryptPassword !== data.password) {
         Logger.warn('Unauthorized access - Invalid Credentials');
-        throw new UnauthorizedException('Unauthorized access - Invalid Credentials');
+        throw new UnauthorizedException(
+          'Unauthorized access - Invalid Credentials',
+        );
       }
 
       const accessToken = await this.getTokens(email, user.role);
       const { password, ...userData } = user;
 
-      Logger.info(`${user.role} with email ${user.email} logged-in successfully`);
-      return { status: HttpStatus.OK, message: 'Login successful', ...accessToken, data: { ...userData } }
+      Logger.info(
+        `${user.role} with email ${user.email} logged-in successfully`,
+      );
+      return {
+        status: HttpStatus.OK,
+        message: 'Login successful',
+        ...accessToken,
+        data: { ...userData },
+      };
     } catch (error) {
       Logger.error(error);
       if (error instanceof UnauthorizedException) {
-        throw new HttpException({
-          status: HttpStatus.UNAUTHORIZED,
-          message: error.message,
-          error: 'UNAUTHORIZED ACCESS',
-        }, HttpStatus.UNAUTHORIZED);
+        throw new HttpException(
+          {
+            status: HttpStatus.UNAUTHORIZED,
+            message: error.message,
+            error: 'UNAUTHORIZED ACCESS',
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
       } else if (error instanceof NotFoundException) {
-        throw new HttpException({
-          status: HttpStatus.NOT_FOUND,
-          message: error.message,
-          error: 'NOT FOUND',
-        }, HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            message: error.message,
+            error: 'NOT FOUND',
+          },
+          HttpStatus.NOT_FOUND,
+        );
       } else {
-        throw new HttpException({
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          message: 'Login service failed, contact support team!',
-        }, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: 'Login service failed, contact support team!',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }
 
   async getTokens(email: string, role: RoleTypes) {
-    const expiresInHours = 5;
+    const expiresInHours = 5; //expires in 5hrs
     const currentTimestamp = Math.floor(Date.now() / 1000);
     const expirationTimestamp = currentTimestamp + expiresInHours * 60 * 60;
 
@@ -128,6 +168,6 @@ export class AuthService {
 
     if (!user) user = await this.adminRepository.findOneBy({ email });
 
-    return user
+    return user;
   }
 }

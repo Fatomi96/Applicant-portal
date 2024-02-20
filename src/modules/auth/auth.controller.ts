@@ -19,10 +19,4 @@ export class AuthController {
     const data = await this.authService.login(loginDto);
     return data;
   }
-
-  // @Get('/applicant/profile')
-  // @UseGuards(AuthGuard)
-  // async getApplicantInfo(@Request() req) {
-  //   return req.user;
-  // }
 }
