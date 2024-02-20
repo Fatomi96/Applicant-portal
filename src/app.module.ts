@@ -1,46 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
+import { config } from 'dotenv';
 import { ApplicantModule } from './modules/applicant/applicant.module';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ILocalProcessEnv } from './interfaces/global';
-import { ScheduleModule } from '@nestjs/schedule';
-import { config } from 'dotenv';
-import { AuthService } from './modules/applicant/auth/auth.service';
-import { AuthController } from './modules/applicant/auth/auth.controller';
-import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { AuthService } from './modules/auth/auth.service';
+import { AuthController } from './modules/auth/auth.controller';
 import { Applicant } from './modules/applicant/applicant.entity';
-import { JwtModule } from '@nestjs/jwt';
 import { AdminController } from './modules/admin/admin.controller';
 import { AdminModule } from './modules/admin/admin.module';
 import { Admin } from './modules/admin/admin.entity';
-import { EncryptionModule } from './helpers/encryption/encryption.module';
-config();
+import { AuthModule } from './modules/auth/auth.module';
+import { EncryptionService } from './utils/helpers/encryptionService';
 
-// const mailerOptions = {
-//   transport: {
-//     host: 'smtp.gmail.com',
-//     port: 465,
-//     secure: true,
-//     auth: {
-//       user: process.env.MAILDEV_INCOMING_USER,
-//       pass: process.env.MAILDEV_INCOMING_PASS,
-//     },
-//   },
-//   defaults: {
-//     from: '"no-reply" <noreply@yourapplication.com>',
-//   },
-//   preview: true,
-//   template: {
-//     dir: __dirname + '/templates',
-//     adapter: new PugAdapter(),
-//     options: {
-//       strict: true,
-//     },
-//   },
-// };
+config();
 
 const {
   DB_PORT: port,
@@ -62,20 +38,10 @@ const dbConfig: TypeOrmModuleOptions = {
   synchronize: true,
 } as TypeOrmModuleOptions;
 
-const jwtOptions = {
-  global: true,
-  secret: process.env.Jwt_Secret_Key,
-  signOptions: { expiresIn: '3d' },
-};
-
 @Module({
   imports: [
-    //MailerModule.forRoot(mailerOptions),
-    EncryptionModule,
-    JwtModule.register(jwtOptions),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot(dbConfig),
-
     TypeOrmModule.forFeature([Applicant, Admin]),
     ThrottlerModule.forRoot({
       throttlers: [
@@ -87,9 +53,10 @@ const jwtOptions = {
     }),
     ApplicantModule,
     AdminModule,
+    AuthModule,
   ],
   controllers: [AppController, AuthController, AdminController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, EncryptionService],
   exports: [AppService],
 })
 export class AppModule {}

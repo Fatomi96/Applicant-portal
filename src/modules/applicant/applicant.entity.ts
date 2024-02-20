@@ -1,11 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { v4 as uuidV4 } from 'uuid';
 import { BaseEntity } from '../../base.entity';
+import { RoleTypes } from '../auth/auth.interface';
 
 @Entity()
 export class Applicant extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidV4();
+  id: string;
 
   @Column({ type: 'varchar', nullable: false })
   firstName: string;
@@ -34,12 +34,18 @@ export class Applicant extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   courseOfStudy: string;
 
-  @Column({ type: 'float', nullable: true })
-  cgpa: number;
+  @Column({ type: 'varchar', nullable: true })
+  cgpa: string;
 
   @Column({ type: 'varchar', nullable: true })
   cv: string;
 
   @Column({ type: 'varchar', nullable: true })
   image: string;
+
+  @Column({ type: 'enum', enum: RoleTypes, nullable: true })
+  role: RoleTypes;
+
+  @Column({ type: 'bool', default: false })
+  hasCompletedProfile: boolean;
 }

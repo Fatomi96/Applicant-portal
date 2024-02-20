@@ -1,11 +1,11 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { v4 as uuidV4 } from 'uuid';
 import { BaseEntity } from '../../base.entity';
+import { RoleTypes } from '../auth/auth.interface';
 
 @Entity()
 export class Admin extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidV4();
+  id: string;
 
   @Column({ type: 'varchar', nullable: false })
   firstName: string;
@@ -33,4 +33,10 @@ export class Admin extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   image: string;
+
+  @Column({ type: 'enum', enum: RoleTypes, default: RoleTypes.ADMIN })
+  role: RoleTypes;
+
+  @Column({ type: 'bool', default: false })
+  hasCompletedProfile: boolean;
 }
