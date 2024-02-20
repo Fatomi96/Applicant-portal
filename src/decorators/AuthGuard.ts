@@ -12,14 +12,12 @@ import Logger from '../utils/helpers/Logger';
 import { EncryptionService } from '../utils/helpers/encryptionService';
 import { Admin } from '../modules/admin/admin.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { AuthService } from '../modules/auth/auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     @InjectRepository(Admin)
-    private adminRepository: Repository<Admin>,
     private encryptionservice: EncryptionService,
     private authService: AuthService,
   ) {}
